@@ -1,0 +1,16 @@
+# Web framework
+fastapi
+uvicorn
+gunicorn
+
+# Database
+SQLAlchemy
+alembic
+psycopg2-binary
+
+# config
+python-dotenv
+
+# tests
+pytest
+pytest-cov
