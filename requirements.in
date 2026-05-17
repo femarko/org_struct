@@ -9,7 +9,7 @@ alembic
 psycopg2-binary
 
 # config
-python-dotenv
+pydantic-settings
 
 # tests
 pytest
