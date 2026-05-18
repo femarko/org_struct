@@ -1,6 +1,13 @@
 from typing import Generic
+from datetime import datetime
 
-from org_struct.domain.repo_interface import T_Model
+from anyio.lowlevel import T
+
+from org_struct.domain.models import (
+    T_Model,
+    T_Department,
+    T_Employee,
+)
 from org_struct.infrastructure.db.sqlalchemy_session import sqlalchemy_session
 
 
@@ -14,10 +21,10 @@ class BaseRepository(Generic[T_Model]):
         self.session = session
         self.model_cls = model_cls
 
-    def add(self, model: T_Model) -> int:
+    def add(self, model: T_Model) -> tuple[int, datetime]:
         self.session.add(model)
         self.session.flush()
-        return model.id
+        return model.id, model.created_at
 
     def get_by_id(self, model_id: int) -> T_Model | None:
         return self.session.get(self.model_cls, model_id)
@@ -38,7 +45,7 @@ class BaseRepository(Generic[T_Model]):
         self.session.delete(model)
 
 
-class DepartmentRepo(BaseRepository): ...
+class DepartmentRepo(BaseRepository[T_Department]): ...
 
 
-class EmployeeRepo(BaseRepository): ...
+class EmployeeRepo(BaseRepository[T_Employee]): ...
