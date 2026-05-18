@@ -1,33 +1,19 @@
 from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy.orm import Mapped
-from typing import (
-    Protocol,
-    TypeVar,
+from typing import Protocol
+
+from anyio.lowlevel import T
+
+from org_struct.domain.models import (
+    T_Model,
+    T_Department,
+    T_Employee,
 )
 
 
 
-class DepartmentProto(Protocol):
-    id: Mapped[int]
-    name: Mapped[str]
-    parent_id: Mapped[int | None]
-    created_at: Mapped[datetime]
-
-
-class EmployeeProto(Protocol):
-    id: Mapped[int]
-    department_id: Mapped[int]
-    full_name: Mapped[str]
-    position: Mapped[str]
-    hired_at: Mapped[datetime]
-
-
-T_Model = TypeVar("T_Model", bound=DepartmentProto | EmployeeProto)
-
-
-class RepoProto(Protocol):
-    def add(self, model: T_Model) -> int: ...
+class RepoProto(Protocol[T_Model]):
+    def add(self, model: T_Model) -> tuple[int, datetime]: ...
     def get_by_id(self, model_id: int) -> T_Model | None: ...
     def find_by_name_and_parent_id(
             self,
@@ -37,7 +23,13 @@ class RepoProto(Protocol):
     def delete(self, model: T_Model) -> None: ...
 
 
+class DepartmentRepoProto(RepoProto[T_Department]): ...
+
+
+class EmployeeRepoProto(RepoProto[T_Employee]): ...
+
+
 @dataclass
 class Repositories:
-    department: RepoProto
-    employee: RepoProto
+    department: DepartmentRepoProto
+    employee: EmployeeRepoProto
