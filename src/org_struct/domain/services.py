@@ -1,6 +1,7 @@
 from org_struct.domain.errors import (
     DepartmentNameConflict,
     DepartmentNotFound,
+    DepartmentCycleError,
 )
 from org_struct.domain.repo_interface import DepartmentRepoProto
 
@@ -50,3 +51,15 @@ def limit_tree(
         limit_tree(child, depth, current + 1)
     
     return department
+
+
+def check_department_cycle(
+          department_id: int,
+          new_parent_id: int,
+          repo: DepartmentRepoProto
+) -> None:
+    current_department_id = new_parent_id
+    while current_department_id is not None:
+        if current_department_id == department_id:
+            raise DepartmentCycleError("Department cycle detected")
+        current_department_id = repo.get_by_parent_id(current_department_id)

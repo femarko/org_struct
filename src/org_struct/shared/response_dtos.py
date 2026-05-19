@@ -4,6 +4,9 @@ from pydantic import BaseModel
 from typing import TypeVar
 
 
+class MessageResponse(BaseModel):
+    message: str
+
 class DepartmentDTO(BaseModel):
     department_id: int
     name: str
@@ -38,5 +41,5 @@ DepartmentTreeDTO.model_rebuild()
 
 T_ResponseDTO = TypeVar(
     "T_ResponseDTO",
-    bound=DepartmentDTO | EmployeeDTO | DepartmentTreeDTO
+    bound=DepartmentDTO | EmployeeDTO | DepartmentTreeDTO | MessageResponse
 )

@@ -5,6 +5,7 @@ from org_struct.domain.services import (
     check_department_exists,
     avoid_department_name_conflict,
     limit_tree,
+    check_department_cycle,
 )
 from org_struct.domain.models import (
     Department,
@@ -15,11 +16,13 @@ from org_struct.shared.request_dtos import (
     AddDepartmentRequest,
     AddEmployeeRequest,
     GetDepartmentRequest,
+    MoveDepartmentRequest,
 )
 from org_struct.shared.response_dtos import (
     DepartmentDTO,
     EmployeeDTO,
     DepartmentTreeDTO,
+    MessageResponse,
     T_ResponseDTO,
 )
 
@@ -83,3 +86,20 @@ class GetDepartment(BaseUseCase[DepartmentTreeDTO]):
         department = limit_tree(department, data.depth)
         return DepartmentTreeDTO.model_validate(department)
 
+
+class MoveDepartment(BaseUseCase[MessageResponse]):
+    def execute(
+            self,
+            data: MoveDepartmentRequest,
+        ) -> MessageResponse:
+        department = check_department_exists(
+            data.department_id,
+            self.repos.department
+        )
+        check_department_cycle(
+            data.department_id,
+            data.new_parent_id,
+            self.repos.department
+        )
+        department.parent_id = data.new_parent_id
+        return MessageResponse(message="New parent ID set")
