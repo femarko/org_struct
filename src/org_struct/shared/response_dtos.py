@@ -18,11 +18,25 @@ class EmployeeDTO(BaseModel):
     full_name: str
     created_at: datetime
 
+    class Config:
+        from_attributes = True
+
 
 class DepartmentTreeDTO(BaseModel):
-    department: DepartmentDTO
-    employees: list[EmployeeDTO] | None
-    children: list[DepartmentDTO]
+    id: int
+    name: str
+    parent_id: int | None
+    children: list["DepartmentDTO"] = []
+    employees: list[EmployeeDTO] = []
+
+    class Config:
+        from_attributes = True
 
 
-T_ResponseDTO = TypeVar("T_ResponseDTO", bound=DepartmentDTO | EmployeeDTO)
+DepartmentTreeDTO.model_rebuild()
+
+
+T_ResponseDTO = TypeVar(
+    "T_ResponseDTO",
+    bound=DepartmentDTO | EmployeeDTO | DepartmentTreeDTO
+)

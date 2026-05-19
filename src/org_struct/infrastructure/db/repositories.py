@@ -1,7 +1,6 @@
 from typing import Generic
 from datetime import datetime
-
-from anyio.lowlevel import T
+from sqlalchemy.orm import selectinload
 
 from org_struct.domain.models import (
     T_Model,
@@ -45,7 +44,16 @@ class BaseRepository(Generic[T_Model]):
         self.session.delete(model)
 
 
-class DepartmentRepo(BaseRepository[T_Department]): ...
-
+class DepartmentRepo(BaseRepository[T_Department]):
+    def get_with_tree(self, department_id: int) -> T_Department | None:
+        return (
+            self.session.query(self.model_cls)
+            .options(
+                selectinload(self.model_cls.children),
+                selectinload(self.model_cls.employees),
+            )
+            .filter(self.model_cls.id == department_id)
+            .one()
+        )
 
 class EmployeeRepo(BaseRepository[T_Employee]): ...

@@ -2,14 +2,15 @@ from org_struct.domain.errors import (
     DepartmentNameConflict,
     DepartmentNotFound,
 )
-from org_struct.domain.repo_interface import RepoProto
+from org_struct.domain.repo_interface import DepartmentRepoProto
+
 from org_struct.domain.models import Department
 
 
 def avoid_department_name_conflict(
-            parent_id: int,
-            name: str,
-            repo: RepoProto
+          parent_id: int,
+          name: str,
+          repo: DepartmentRepoProto
 ) -> None:
         if repo.find_by_name_and_parent_id(
             name=name,
@@ -21,15 +22,31 @@ def avoid_department_name_conflict(
 
 
 def check_department_exists(
-            department_id: int,
-            repo: RepoProto,
-            return_department: bool = False,
-) -> Department | None:
+          department_id: int,
+          repo: DepartmentRepoProto,
+) -> Department:
         department = repo.get_by_id(department_id)
         if department is None:
             raise DepartmentNotFound(
                 f"Department with ID `{department_id}` does not exist."
                 f"Employee cannot be added"
             )
-        if return_department:
-            return department
+        return department
+        
+
+def limit_tree(
+          department: Department,
+          depth: int,
+          current: int = 1,
+) -> Department:
+    
+    depth = max(1, min(depth, 5))
+    
+    if current >= depth:
+        department.children = []
+        return department
+
+    for child in department.children:
+        limit_tree(child, depth, current + 1)
+    
+    return department
