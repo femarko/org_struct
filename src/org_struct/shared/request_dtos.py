@@ -22,7 +22,8 @@ class AddEmployeeRequest(BaseModel):
     validate_position = validate_string("position")
 
 
-class GetDepartment(BaseModel):
+class GetDepartmentRequest(BaseModel):
+   department_id: int
    depth: int
    include_employees: bool
  
