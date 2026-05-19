@@ -33,7 +33,7 @@ class Department(SQLAlchBaseModel):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     parent = relationship(
         "Department",
-        remote_side="Department.id",
+        remote_side=[id],
         back_populates="children",
     )
     children = relationship(
@@ -41,6 +41,8 @@ class Department(SQLAlchBaseModel):
         back_populates="parent",
         cascade="all, delete-orphan",
     )
+    employees = relationship("Employee", back_populates="department")
+
 
 class Employee(SQLAlchBaseModel):
     __tablename__ = "employees"
@@ -65,6 +67,7 @@ class DepartmentProto(Protocol):
     created_at: Mapped[datetime]
     parent: Mapped["Department"]
     children: Mapped[list["Department"]]
+    employees: Mapped[list["Employee"]]
 
 
 class EmployeeProto(Protocol):
