@@ -17,6 +17,8 @@ from org_struct.shared.request_dtos import (
     AddEmployeeRequest,
     GetDepartmentRequest,
     MoveDepartmentRequest,
+    DeleteDepartmentRequest,
+    DeletionMode,
 )
 from org_struct.shared.response_dtos import (
     DepartmentDTO,
@@ -103,3 +105,32 @@ class MoveDepartment(BaseUseCase[MessageResponse]):
         )
         department.parent_id = data.new_parent_id
         return MessageResponse(message="New parent ID set")
+    
+
+class DeleteDepartment(BaseUseCase[MessageResponse]):
+    def execute(self, data: DeleteDepartmentRequest) -> MessageResponse:
+        department = check_department_exists(
+            data.department_id,
+            self.repos.department
+        )
+
+        if data.mode == DeletionMode.CASCADE:
+            self.repos.department.delete(department) 
+            return MessageResponse(message="Department deleted")
+        
+        target_department = check_department_exists(
+            data.reassign_to_department_id,
+            self.repos.department
+        )
+
+        if target_department.id == department.id:
+            raise ValueError(
+                "`reassign_to_department_id` cannot be the same as `department_id`"
+            )
+        for employee in department.employees:
+            employee.department_id = target_department.id
+
+        for child in department.children:
+            child.parent_id = department.parent_id
+        self.repos.department.delete(department)
+        return MessageResponse(message="Department deleted")
