@@ -62,4 +62,4 @@ def check_department_cycle(
     while current_department_id is not None:
         if current_department_id == department_id:
             raise DepartmentCycleError("Department cycle detected")
-        current_department_id = repo.get_by_parent_id(current_department_id)
+        current_department_id = repo.get_by_id(current_department_id).parent_id
