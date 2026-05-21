@@ -1,7 +1,7 @@
 from typing import Generic
 from datetime import datetime
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy.exc import NoResultFound as SQLAlchemyNoResultFound
 
 from org_struct.domain.errors import DepartmentNotFound
 from org_struct.domain.models import (
@@ -27,8 +27,13 @@ class BaseRepository(Generic[T_Model]):
         self.session.flush()
         return model.id, model.created_at
 
-    def get_by_id(self, model_id: int) -> T_Model | None:
-        return self.session.get(self.model_cls, model_id)
+    def get_by_id(self, model_id: int) -> T_Model:
+        result = self.session.get(self.model_cls, model_id)
+        if result is None:
+            raise DepartmentNotFound(
+                f"Department with ID `{model_id}` does not exist."
+            )
+        return result
 
     def delete(self, model: T_Model) -> None:
         self.session.delete(model)
@@ -45,39 +50,17 @@ class DepartmentRepo(BaseRepository[T_Department]):
             .filter(self.model_cls.id == department_id)
             .one()
         )
-    
-    def get_by_parent_id(self, parent_id: int) -> T_Department | None:
-        try:
-            result = (
-                self.session.query(self.model_cls)
-                .filter(self.model_cls.parent_id == parent_id)
-                .one()
-            )
-        except SQLAlchemyNoResultFound as e:
-            raise DepartmentNotFound(
-                f"Department with {parent_id=} does not exist"
-            ) from e
-        else:
-            return result
 
     def find_by_name_and_parent_id(
             self,
             name: str,
             parent_id: int
     ) -> int | None:
-        try:
-            dep_fetched = self.session.query(self.model_cls).filter_by(
-                name=name,
-                parent_id=parent_id
-            ).one()
-        except SQLAlchemyNoResultFound as e:
-            raise DepartmentNotFound(
-                f"Department with {name=} name and {parent_id=} "
-                f"does not exist"
-            ) from e
-        else:
-            result = dep_fetched.id if dep_fetched else None
-            return result
+        stmt = select(self.model_cls.id).filter_by(
+            name = name,
+            parent_id = parent_id
+        )
+        return self.session.execute(stmt).scalar_one_or_none()
 
 
 class EmployeeRepo(BaseRepository[T_Employee]): ...
