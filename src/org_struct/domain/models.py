@@ -68,7 +68,7 @@ class Employee(SQLAlchBaseModel):
     )  
     full_name: Mapped[str] = mapped_column(String(200), nullable=False)
     position: Mapped[str] = mapped_column(String(200), nullable=False)
-    hired_at: Mapped[datetime] = mapped_column(DateTime)
+    hired_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
