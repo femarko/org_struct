@@ -7,7 +7,7 @@ from org_struct.shared.validators import validate_string
 
 class AddDepartmentRequest(BaseModel):
     name: str
-    parent_id: int | None
+    parent_id: int | None = None
 
     validate_name = validate_string("name")
 
