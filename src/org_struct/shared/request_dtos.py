@@ -26,6 +26,7 @@ class GetDepartmentRequest(BaseModel):
    depth: int
    include_employees: bool
  
+ 
 class MoveDepartmentRequest(BaseModel):
     department_id: int
     new_parent_id: int

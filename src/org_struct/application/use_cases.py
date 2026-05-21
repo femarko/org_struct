@@ -53,7 +53,7 @@ class AddDepartment(BaseUseCase[DepartmentDTO]):
         )
         department_id, created_at = self.repos.department.add(department)
         return DepartmentDTO(
-            department_id=department_id,
+            id=department_id,
             name=department.name,
             parent_id=department.parent_id,
             created_at=created_at,
@@ -70,7 +70,7 @@ class AddEmployee(BaseUseCase[EmployeeDTO]):
         )
         employee_id, created_at = self.repos.employee.add(employee)
         return EmployeeDTO(
-            employee_id=employee_id,
+            id=employee_id,
             department_id=employee.department_id,
             position=employee.position,
             full_name=employee.full_name,

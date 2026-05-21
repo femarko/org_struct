@@ -56,10 +56,15 @@ def add_employee(
 @router.get("/departments/{id}")
 def get_department(
         id: int,
-        data: GetDepartmentRequest,
+        depth: int,
+        include_employees: bool,
         get_department_use_case: GetDepartment = Depends(get_get_department_use_case),
 ) -> DepartmentTreeDTO:
-    data.department_id = id
+    data = GetDepartmentRequest(
+        department_id=id,
+        depth=depth,
+        include_employees=include_employees
+    )
     return get_department_use_case.execute(data=data)
 
 

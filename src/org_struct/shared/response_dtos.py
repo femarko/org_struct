@@ -1,6 +1,9 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import (
+    BaseModel,
+    Field,
+)
 from typing import TypeVar
 
 
@@ -8,14 +11,14 @@ class MessageResponse(BaseModel):
     message: str
 
 class DepartmentDTO(BaseModel):
-    department_id: int
+    id: int
     name: str
     parent_id: int | None
     created_at: datetime
 
 
 class EmployeeDTO(BaseModel):
-    employee_id: int
+    id: int
     department_id: int
     position: str
     full_name: str
@@ -29,8 +32,8 @@ class DepartmentTreeDTO(BaseModel):
     id: int
     name: str
     parent_id: int | None
-    children: list["DepartmentDTO"] = []
-    employees: list[EmployeeDTO] = []
+    children: list["DepartmentTreeDTO"] = Field(default_factory=list)
+    employees: list["EmployeeDTO"] = Field(default_factory=list)
 
     class Config:
         from_attributes = True
