@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     func,
     ForeignKey,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -25,6 +26,10 @@ class SQLAlchBaseModel(DeclarativeBase): ...
 
 class Department(SQLAlchBaseModel):
     __tablename__ = "departments"
+
+    __table_args__= (
+        UniqueConstraint("name", "parent_id", name="unique_name_within_parent_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
