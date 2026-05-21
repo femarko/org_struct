@@ -1,3 +1,4 @@
+from http import server
 from typing import (
     Protocol,
     TypeVar,
@@ -7,6 +8,7 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
+    func,
     ForeignKey,
 )
 from sqlalchemy.orm import (
@@ -30,7 +32,12 @@ class Department(SQLAlchBaseModel):
         ForeignKey("departments.id", ondelete="CASCADE"),
         index=True,
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        index=True,
+        server_default=func.now()
+    )
     parent = relationship(
         "Department",
         remote_side=[id],
@@ -57,7 +64,13 @@ class Employee(SQLAlchBaseModel):
     full_name: Mapped[str] = mapped_column(String(200), nullable=False)
     position: Mapped[str] = mapped_column(String(200), nullable=False)
     hired_at: Mapped[datetime] = mapped_column(DateTime)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        index=True,
+        server_default=func.now()
+    )
+    department = relationship("Department", back_populates="employees")
 
 
 class DepartmentProto(Protocol):
