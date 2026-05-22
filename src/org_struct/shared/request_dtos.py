@@ -1,6 +1,9 @@
 from enum import StrEnum
 
-from pydantic import BaseModel, model_validator 
+from pydantic import (
+    BaseModel,
+    model_validator,
+) 
 from org_struct.shared.validators import validate_string
 
 
@@ -26,9 +29,10 @@ class GetDepartmentRequest(BaseModel):
    depth: int
    include_employees: bool
  
- 
+
 class MoveDepartmentRequest(BaseModel):
-    department_id: int
+    id : int
+    name: str | None = None
     new_parent_id: int
 
 

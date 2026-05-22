@@ -89,22 +89,22 @@ class GetDepartment(BaseUseCase[DepartmentTreeDTO]):
         return DepartmentTreeDTO.model_validate(department)
 
 
-class MoveDepartment(BaseUseCase[MessageResponse]):
+class MoveDepartment(BaseUseCase[DepartmentDTO]):
     def execute(
             self,
             data: MoveDepartmentRequest,
-        ) -> MessageResponse:
+        ) -> DepartmentDTO:
         department = check_department_exists(
-            data.department_id,
+            data.id,
             self.repos.department
         )
         check_department_cycle(
-            data.department_id,
+            data.id,
             data.new_parent_id,
             self.repos.department
         )
         department.parent_id = data.new_parent_id
-        return MessageResponse(message="New parent ID set")
+        return DepartmentDTO.model_validate(department)
     
 
 class DeleteDepartment(BaseUseCase[MessageResponse]):

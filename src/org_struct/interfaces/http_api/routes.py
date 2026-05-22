@@ -73,8 +73,8 @@ def move_department(
         id: int,
         data: MoveDepartmentRequest,
         move_department_use_case: MoveDepartment = Depends(get_move_department_use_case),
-) -> MessageResponse:
-    data.department_id = id
+) -> DepartmentDTO:
+    data.id = id
     return move_department_use_case.execute(data=data)
 
 
