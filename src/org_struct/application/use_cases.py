@@ -25,6 +25,7 @@ from org_struct.shared.response_dtos import (
     EmployeeDTO,
     DepartmentTreeDTO,
     MessageResponse,
+    StatusEnum,
     T_ResponseDTO,
 )
 
@@ -116,7 +117,10 @@ class DeleteDepartment(BaseUseCase[MessageResponse]):
 
         if data.mode == DeletionMode.CASCADE:
             self.repos.department.delete(department) 
-            return MessageResponse(message="Department deleted")
+            return MessageResponse(
+                status=StatusEnum.SUCCESS,
+                message="Department deleted"
+            )
         
         target_department = check_department_exists(
             data.reassign_to_department_id,
@@ -133,4 +137,7 @@ class DeleteDepartment(BaseUseCase[MessageResponse]):
         for child in department.children:
             child.parent_id = department.parent_id
         self.repos.department.delete(department)
-        return MessageResponse(message="Department deleted")
+        return MessageResponse(
+                status=StatusEnum.SUCCESS,
+                message="Department deleted"
+        )

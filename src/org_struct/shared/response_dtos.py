@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from enum import StrEnum
 from pydantic import (
     BaseModel,
     Field,
@@ -8,8 +8,16 @@ from pydantic import (
 from typing import TypeVar
 
 
+
+class StatusEnum(StrEnum):
+    SUCCESS = "success"
+    FAILED = "failed"
+
+
 class MessageResponse(BaseModel):
+    status: StatusEnum
     message: str
+
 
 class DepartmentDTO(BaseModel):
     id: int
