@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import StrEnum
 
 from pydantic import (
@@ -19,6 +20,7 @@ class AddEmployeeRequest(BaseModel):
     full_name: str
     position: str
     department_id: int
+    hired_at: datetime | None = None
 
     validate_full_name = validate_string("full_name")
     validate_position = validate_string("position")
@@ -42,7 +44,7 @@ class DeletionMode(StrEnum):
 
 
 class DeleteDepartmentRequest(BaseModel):
-    department_id: int
+    id: int
     mode: DeletionMode
     reassign_to_department_id: int | None
     

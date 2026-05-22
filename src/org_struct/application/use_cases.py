@@ -110,7 +110,7 @@ class MoveDepartment(BaseUseCase[DepartmentDTO]):
 class DeleteDepartment(BaseUseCase[MessageResponse]):
     def execute(self, data: DeleteDepartmentRequest) -> MessageResponse:
         department = check_department_exists(
-            data.department_id,
+            data.id,
             self.repos.department
         )
 
