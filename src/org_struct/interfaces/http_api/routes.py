@@ -15,6 +15,7 @@ from org_struct.shared.request_dtos import (
     AddEmployeeRequest,
     GetDepartmentRequest,
     MoveDepartmentRequest,
+    DeletionMode,
     DeleteDepartmentRequest,
 )
 from org_struct.shared.response_dtos import (
@@ -35,7 +36,7 @@ from org_struct.interfaces.http_api.dependencies import (
 router = APIRouter()
 
 
-@router.post("/departments")
+@router.post("/departments", status_code=201)
 def add_department(
         data: AddDepartmentRequest,
         add_department_use_case: AddDepartment = Depends(get_add_department_use_case),
@@ -43,7 +44,7 @@ def add_department(
     return add_department_use_case.execute(data=data)
 
 
-@router.post("/departments/{id}/employees")
+@router.post("/departments/{id}/employees", status_code=201)
 def add_employee(
         id: int,
         data: AddEmployeeRequest,
@@ -56,8 +57,8 @@ def add_employee(
 @router.get("/departments/{id}")
 def get_department(
         id: int,
-        depth: int,
-        include_employees: bool,
+        depth: int = 1,
+        include_employees: bool = True,
         get_department_use_case: GetDepartment = Depends(get_get_department_use_case),
 ) -> DepartmentTreeDTO:
     data = GetDepartmentRequest(
@@ -78,11 +79,16 @@ def move_department(
     return move_department_use_case.execute(data=data)
 
 
-@router.delete("/departments/{id}")
+@router.delete("/departments/{id}", status_code=204)
 def delete_department(
         id: int,
-        data: DeleteDepartmentRequest,
+        mode: DeletionMode,
+        reassign_to_department_id: int | None = None,
         delete_department_use_case: DeleteDepartment = Depends(get_delete_department_use_case),
-) -> MessageResponse:
-    data.department_id = id
+):
+    data = DeleteDepartmentRequest(
+        id=id,
+        mode=mode,
+        reassign_to_department_id=reassign_to_department_id
+    )
     return delete_department_use_case.execute(data=data)
