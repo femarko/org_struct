@@ -1,7 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
 from org_struct.interfaces.http_api.routes import router
-from org_struct.interfaces.http_api.dependencies import get_repos
+
+
 
 app = FastAPI()
 app.include_router(router)
