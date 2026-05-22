@@ -33,10 +33,10 @@ from org_struct.interfaces.http_api.dependencies import (
 )
 
 
-router = APIRouter()
+departments_router = APIRouter(prefix="/departments", tags=["departments"])
 
 
-@router.post("/departments", status_code=201)
+@departments_router.post("/", status_code=201)
 def add_department(
         data: AddDepartmentRequest,
         add_department_use_case: AddDepartment = Depends(get_add_department_use_case),
@@ -44,7 +44,7 @@ def add_department(
     return add_department_use_case.execute(data=data)
 
 
-@router.post("/departments/{id}/employees", status_code=201)
+@departments_router.post("/{id}/employees", status_code=201)
 def add_employee(
         id: int,
         data: AddEmployeeRequest,
@@ -54,7 +54,7 @@ def add_employee(
     return add_employee_use_case.execute(data=data)
 
 
-@router.get("/departments/{id}")
+@departments_router.get("/{id}")
 def get_department(
         id: int,
         depth: int = 1,
@@ -69,7 +69,7 @@ def get_department(
     return get_department_use_case.execute(data=data)
 
 
-@router.patch("/departments/{id}")
+@departments_router.patch("/{id}")
 def move_department(
         id: int,
         data: MoveDepartmentRequest,
@@ -79,7 +79,7 @@ def move_department(
     return move_department_use_case.execute(data=data)
 
 
-@router.delete("/departments/{id}", status_code=204)
+@departments_router.delete("/{id}", status_code=204)
 def delete_department(
         id: int,
         mode: DeletionMode,

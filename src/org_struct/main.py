@@ -1,11 +1,11 @@
 import uvicorn
 from fastapi import FastAPI
-from org_struct.interfaces.http_api.routes import router
+from org_struct.interfaces.http_api.routes import departments_router
 
 
 
 app = FastAPI()
-app.include_router(router)
+app.include_router(departments_router, prefix="/api/v1")
 
 
 
