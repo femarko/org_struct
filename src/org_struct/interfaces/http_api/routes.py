@@ -22,7 +22,6 @@ from org_struct.shared.response_dtos import (
     DepartmentDTO,
     EmployeeDTO,
     DepartmentTreeDTO,
-    MessageResponse,
 )
 from org_struct.interfaces.http_api.dependencies import (
     get_add_department_use_case,
@@ -85,7 +84,7 @@ def delete_department(
         mode: DeletionMode,
         reassign_to_department_id: int | None = None,
         delete_department_use_case: DeleteDepartment = Depends(get_delete_department_use_case),
-):
+) -> None:
     data = DeleteDepartmentRequest(
         id=id,
         mode=mode,

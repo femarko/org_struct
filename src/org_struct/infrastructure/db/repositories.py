@@ -1,5 +1,6 @@
 from typing import Generic
 from datetime import datetime
+from anyio.lowlevel import T
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -22,10 +23,10 @@ class BaseRepository(Generic[T_Model]):
         self.session = session
         self.model_cls = model_cls
 
-    def add(self, model: T_Model) -> tuple[int, datetime]:
+    def add(self, model: T_Model) -> T_Model:
         self.session.add(model)
         self.session.flush()
-        return model.id, model.created_at
+        return model
 
     def get_by_id(self, model_id: int) -> T_Model:
         result = self.session.get(self.model_cls, model_id)

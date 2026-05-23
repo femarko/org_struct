@@ -24,8 +24,6 @@ from org_struct.shared.response_dtos import (
     DepartmentDTO,
     EmployeeDTO,
     DepartmentTreeDTO,
-    MessageResponse,
-    StatusEnum,
     T_ResponseDTO,
 )
 
@@ -52,13 +50,8 @@ class AddDepartment(BaseUseCase[DepartmentDTO]):
             name=data.name,
             parent_id=data.parent_id,
         )
-        department_id, created_at = self.repos.department.add(department)
-        return DepartmentDTO(
-            id=department_id,
-            name=department.name,
-            parent_id=department.parent_id,
-            created_at=created_at,
-        )
+        self.repos.department.add(department)
+        return DepartmentDTO.model_validate(department)
 
 
 class AddEmployee(BaseUseCase[EmployeeDTO]):
@@ -69,14 +62,8 @@ class AddEmployee(BaseUseCase[EmployeeDTO]):
             full_name=data.full_name,
             position=data.position,
         )
-        employee_id, created_at = self.repos.employee.add(employee)
-        return EmployeeDTO(
-            id=employee_id,
-            department_id=employee.department_id,
-            position=employee.position,
-            full_name=employee.full_name,
-            created_at=created_at,
-        )
+        self.repos.employee.add(employee)
+        return EmployeeDTO.model_validate(employee)
 
 
 class GetDepartment(BaseUseCase[DepartmentTreeDTO]):
@@ -108,8 +95,8 @@ class MoveDepartment(BaseUseCase[DepartmentDTO]):
         return DepartmentDTO.model_validate(department)
     
 
-class DeleteDepartment(BaseUseCase[MessageResponse]):
-    def execute(self, data: DeleteDepartmentRequest) -> MessageResponse:
+class DeleteDepartment(BaseUseCase):
+    def execute(self, data: DeleteDepartmentRequest) -> None:
         department = check_department_exists(
             data.id,
             self.repos.department
@@ -117,10 +104,7 @@ class DeleteDepartment(BaseUseCase[MessageResponse]):
 
         if data.mode == DeletionMode.CASCADE:
             self.repos.department.delete(department) 
-            return MessageResponse(
-                status=StatusEnum.SUCCESS,
-                message="Department deleted"
-            )
+            return
         
         target_department = check_department_exists(
             data.reassign_to_department_id,
@@ -137,7 +121,3 @@ class DeleteDepartment(BaseUseCase[MessageResponse]):
         for child in department.children:
             child.parent_id = department.parent_id
         self.repos.department.delete(department)
-        return MessageResponse(
-                status=StatusEnum.SUCCESS,
-                message="Department deleted"
-        )
