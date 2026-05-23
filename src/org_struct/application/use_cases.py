@@ -23,7 +23,8 @@ from org_struct.shared.request_dtos import (
 from org_struct.shared.response_dtos import (
     DepartmentDTO,
     EmployeeDTO,
-    DepartmentTreeDTO,
+    TreeDTO,
+    TreeWithEmployeesDTO,
     T_ResponseDTO,
 )
 
@@ -66,15 +67,16 @@ class AddEmployee(BaseUseCase[EmployeeDTO]):
         return EmployeeDTO.model_validate(employee)
 
 
-class GetDepartment(BaseUseCase[DepartmentTreeDTO]):
-    def execute(self, data: GetDepartmentRequest) -> DepartmentTreeDTO:
+class GetDepartment(BaseUseCase[TreeDTO | TreeWithEmployeesDTO]):
+    def execute(self, data: GetDepartmentRequest) -> TreeDTO | TreeWithEmployeesDTO:
         department =self.repos.department.get_with_tree(data.department_id)
         if department is None:
             raise DepartmentNotFound(
                 f"Department with ID `{data.department_id}` does not exist."
             )
         department = limit_tree(department, data.depth)
-        return DepartmentTreeDTO.model_validate(department)
+        result = TreeWithEmployeesDTO if data.include_employees else TreeDTO
+        return result.model_validate(department)
 
 
 class MoveDepartment(BaseUseCase[DepartmentDTO]):

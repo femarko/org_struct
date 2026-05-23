@@ -41,7 +41,10 @@ class BaseRepository(Generic[T_Model]):
 
 
 class DepartmentRepo(BaseRepository[T_Department]):
-    def get_with_tree(self, department_id: int) -> T_Department | None:
+    def get_with_tree(
+            self,
+            department_id: int,
+        ) -> T_Department | None:
         return (
             self.session.query(self.model_cls)
             .options(

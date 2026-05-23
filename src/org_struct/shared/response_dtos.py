@@ -3,6 +3,7 @@ from datetime import (
     timezone,
 )
 from enum import StrEnum
+from math import e
 from pydantic import (
     BaseModel,
     Field,
@@ -38,11 +39,37 @@ class EmployeeDTO(BaseModel):
         from_attributes = True
 
 
-class DepartmentTreeDTO(BaseModel):
+class TreeDTO(BaseModel):
     id: int
     name: str
     parent_id: int | None
-    children: list["DepartmentTreeDTO"] = Field(default_factory=list)
+    children: list["TreeDTO"] = Field(default_factory=list)
+
+    class Config:
+        from_attributes = True
+        extra = "ignore"
+        json_schema_extra = {
+            "example": {
+                "id": 42,
+                "name": "Sales",
+                "parent_id": None,
+                "children": [
+                    {
+                        "id": 43,
+                        "name": "Wholesale",
+                        "parent_id": 42,
+                        "children": []
+                    }
+                ]
+            }
+        }
+
+
+class TreeWithEmployeesDTO(BaseModel):
+    id: int
+    name: str
+    parent_id: int | None
+    children: list["TreeWithEmployeesDTO"] = Field(default_factory=list)
     employees: list["EmployeeDTO"] = Field(default_factory=list)
 
     class Config:
@@ -82,10 +109,13 @@ class DepartmentTreeDTO(BaseModel):
         }
 
 
-DepartmentTreeDTO.model_rebuild()
+TreeDTO.model_rebuild()
+
+
+TreeWithEmployeesDTO.model_rebuild()
 
 
 T_ResponseDTO = TypeVar(
     "T_ResponseDTO",
-    bound=DepartmentDTO | EmployeeDTO | DepartmentTreeDTO
+    bound=DepartmentDTO | EmployeeDTO | TreeDTO | TreeWithEmployeesDTO
 )

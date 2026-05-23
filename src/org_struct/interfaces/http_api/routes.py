@@ -21,7 +21,8 @@ from org_struct.shared.request_dtos import (
 from org_struct.shared.response_dtos import (
     DepartmentDTO,
     EmployeeDTO,
-    DepartmentTreeDTO,
+    TreeDTO,
+    TreeWithEmployeesDTO,
 )
 from org_struct.interfaces.http_api.dependencies import (
     get_add_department_use_case,
@@ -59,7 +60,7 @@ def get_department(
         depth: int = 1,
         include_employees: bool = True,
         get_department_use_case: GetDepartment = Depends(get_get_department_use_case),
-) -> DepartmentTreeDTO:
+) -> TreeDTO | TreeWithEmployeesDTO:
     data = GetDepartmentRequest(
         department_id=id,
         depth=depth,
