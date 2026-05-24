@@ -11,6 +11,8 @@ from sqlalchemy import (
     func,
     ForeignKey,
     UniqueConstraint,
+    Index,
+    text,
 )
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -29,6 +31,12 @@ class Department(SQLAlchBaseModel):
 
     __table_args__= (
         UniqueConstraint("name", "parent_id", name="unique_name_within_parent_id"),
+        Index(
+            "unique_root_department_name",
+            "name",
+            unique=True,
+            postgresql_where=text("parent_id IS NULL"),
+        )
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
