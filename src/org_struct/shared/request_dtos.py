@@ -2,13 +2,13 @@ from datetime import (
     datetime,
     timezone,
 )
-from enum import StrEnum
 
 from pydantic import (
     BaseModel,
     Field,
     model_validator,
 ) 
+from org_struct.shared.enums import DeletionMode
 from org_struct.shared.validators import validate_string
 
 
@@ -39,13 +39,11 @@ class AddEmployeeRequest(BaseModel):
 
     model_config = {
         "json_schema_extra": {
-            "example": [
-                {
-                    "full_name": "John Doe",
-                    "position": "Sales Manager",
-                    "hired_at": "2022-01-01T00:00:00Z"
-                }
-            ]
+            "example": {
+                "full_name": "John Doe",
+                "position": "Sales Manager",
+                "hired_at": "2022-01-01T00:00:00Z"
+            }
         }
     }
 
@@ -57,24 +55,16 @@ class GetDepartmentRequest(BaseModel):
  
 
 class MoveDepartmentRequest(BaseModel):
-    id : int
     name: str | None = None
-    new_parent_id: int
+    new_parent_id: int | None = None
 
     model_config = {
         "json_schema_extra": {
             "example": {
-                "id": 42,
-                "name": "Sales",
                 "new_parent_id": 2
             }
         }
     }
-
-
-class DeletionMode(StrEnum):
-    CASCADE = "cascade"
-    REASSIGN = "reassign"
 
 
 class DeleteDepartmentRequest(BaseModel):

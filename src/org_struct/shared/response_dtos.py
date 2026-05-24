@@ -2,13 +2,10 @@ from datetime import (
     datetime,
     timezone,
 )
-from enum import StrEnum
-from math import e
 from pydantic import (
     BaseModel,
     Field,
     ConfigDict,
-    json_schema,
 )
 from typing import TypeVar
 
@@ -69,8 +66,9 @@ class TreeWithEmployeesDTO(BaseModel):
     id: int
     name: str
     parent_id: int | None
-    children: list["TreeWithEmployeesDTO"] = Field(default_factory=list)
     employees: list["EmployeeDTO"] = Field(default_factory=list)
+    children: list["TreeWithEmployeesDTO"] = Field(default_factory=list)
+
 
     class Config:
         from_attributes = True

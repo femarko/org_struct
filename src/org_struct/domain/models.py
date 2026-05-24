@@ -97,6 +97,6 @@ class EmployeeProto(Protocol):
     created_at: Mapped[datetime]
 
 
-T_Model = TypeVar("T_Model", bound=DepartmentProto | EmployeeProto)
-T_Department = TypeVar("T_Department", bound=DepartmentProto)
-T_Employee = TypeVar("T_Employee", bound=EmployeeProto)
+T_Model = TypeVar("T_Model", bound=Department | Employee)
+T_Department = TypeVar("T_Department", bound=Department)
+T_Employee = TypeVar("T_Employee", bound=Employee)
