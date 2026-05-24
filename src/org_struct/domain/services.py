@@ -23,12 +23,12 @@ from org_struct.shared.enums import DeletionMode
 
 
 class Service:
-    def __init__(self, repos: Repositories):
+    def __init__(self, repos: Repositories) -> None:
         self.repos = repos
 
     def _avoid_department_name_conflict(
           self,
-          parent_id: int,
+          parent_id: int | None,
           name: str,
     ) -> None:
         if self.repos.department.find_by_name_and_parent_id(
@@ -36,7 +36,9 @@ class Service:
             parent_id=parent_id
         ):
             raise DepartmentNameConflict(
-                "Department with same name and pareant_id already exists"
+                f"Department with the same name and parent_id "
+                f"or a top level department with the same name "
+                f"already exists"
             )
 
     def _check_department_exists(
@@ -84,11 +86,10 @@ class Service:
         name: str,
         parent_id: int | None = None,
     ) -> DepartmentDTO:
-        if parent_id:
-            self._avoid_department_name_conflict(
-                parent_id,
-                name,
-            )
+        self._avoid_department_name_conflict(
+            parent_id,
+            name,
+        )
         department = Department(
             name=name,
             parent_id=parent_id,

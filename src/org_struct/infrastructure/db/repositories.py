@@ -1,6 +1,7 @@
-from typing import Generic
-from datetime import datetime
-from anyio.lowlevel import T
+from typing import (
+    Generic,
+    Sequence,
+)
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -58,13 +59,13 @@ class DepartmentRepo(BaseRepository[T_Department]):
     def find_by_name_and_parent_id(
             self,
             name: str,
-            parent_id: int
-    ) -> int | None:
+            parent_id: int | None
+    ) -> Sequence[int]:
         stmt = select(self.model_cls.id).filter_by(
             name = name,
             parent_id = parent_id
         )
-        return self.session.execute(stmt).scalar_one_or_none()
+        return self.session.execute(stmt).scalars().all()
 
 
 class EmployeeRepo(BaseRepository[T_Employee]): ...

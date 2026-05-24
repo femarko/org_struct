@@ -20,7 +20,7 @@ class DepartmentRepoProto(Protocol):
     def find_by_name_and_parent_id(
             self,
             name: str,
-            parent_id: int
+            parent_id: int | None
     ) -> int | None: ...
 
     def get_by_parent_id(self, parent_id: int) -> Department | None: ...
