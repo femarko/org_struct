@@ -159,7 +159,7 @@ class Service:
                 f"as `department_id`"
             )
         for employee in department.employees:
-            employee.department_id = target_department.id
+            employee.department = target_department
         for child in department.children:
             child.parent_id = department.parent_id
         self.repos.department.delete(department)

@@ -53,7 +53,7 @@ class Department(SQLAlchBaseModel):
         back_populates="parent",
         cascade="all, delete-orphan",
     )
-    employees = relationship("Employee", back_populates="department")
+    employees = relationship("Employee", back_populates="department", passive_deletes=True)
 
 
 class Employee(SQLAlchBaseModel):
@@ -62,7 +62,7 @@ class Employee(SQLAlchBaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     department_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("departments.id", ondelete="CASCADE"),
+        ForeignKey("departments.id"),
         nullable=False,
         index=True
     )  
