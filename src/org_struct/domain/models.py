@@ -70,7 +70,7 @@ class Employee(SQLAlchBaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     department_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("departments.id"),
+        ForeignKey("departments.id", ondelete="CASCADE", name="employees_department_id_fkey"),
         nullable=False,
         index=True
     )  
