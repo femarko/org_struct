@@ -1,13 +1,11 @@
+from datetime import datetime
+
 from org_struct.domain.errors import (
     DepartmentNameConflict,
     DepartmentNotFound,
     DepartmentCycleError,
 )
-from org_struct.domain.repo_interface import (
-    DepartmentRepoProto,
-    EmployeeRepoProto,
-    Repositories
-)
+from org_struct.domain.repo_interface import Repositories
 from org_struct.domain.models import (
     Department,
     Employee,
@@ -102,6 +100,7 @@ class Service:
         department_id: int,
         full_name: str,
         position: str,
+        hired_at: datetime | None = None
     ) -> EmployeeDTO:
         _ = self._check_department_exists(department_id)
         employee = Employee(
@@ -109,6 +108,8 @@ class Service:
             full_name=full_name,
             position=position,
         )
+        if hired_at is not None:
+            employee.hired_at = hired_at
         employee_with_id = self.repos.employee.add(employee)
         return EmployeeDTO.model_validate(employee_with_id)
     

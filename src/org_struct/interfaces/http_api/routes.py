@@ -45,6 +45,7 @@ def add_employee(
         data.department_id,
         data.full_name,
         data.position,
+        data.hired_at
     )
 
 
