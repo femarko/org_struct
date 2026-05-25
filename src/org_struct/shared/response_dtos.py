@@ -32,8 +32,7 @@ class EmployeeDTO(BaseModel):
         examples=["2022-01-01T00:00:00Z"]
     )
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TreeDTO(BaseModel):
@@ -42,9 +41,9 @@ class TreeDTO(BaseModel):
     parent_id: int | None
     children: list["TreeDTO"] = Field(default_factory=list)
 
-    class Config:
-        from_attributes = True
-        extra = "ignore"
+    model_config = ConfigDict(
+        from_attributes = True,
+        extra = "ignore",
         json_schema_extra = {
             "example": {
                 "id": 42,
@@ -59,7 +58,8 @@ class TreeDTO(BaseModel):
                     }
                 ]
             }
-        }
+        },
+    )
 
 
 class TreeWithEmployeesDTO(BaseModel):
@@ -69,9 +69,8 @@ class TreeWithEmployeesDTO(BaseModel):
     employees: list["EmployeeDTO"] = Field(default_factory=list)
     children: list["TreeWithEmployeesDTO"] = Field(default_factory=list)
 
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes = True,
         json_schema_extra = {
             "example": {
                 "id": 42,
@@ -104,7 +103,8 @@ class TreeWithEmployeesDTO(BaseModel):
                     }
                 ]
             }
-        }
+        },
+    )
 
 
 TreeDTO.model_rebuild()
