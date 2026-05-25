@@ -46,7 +46,7 @@ class Service:
         department = self.repos.department.get_by_id(department_id)
         if department is None:
             raise DepartmentNotFound(
-                f"Department with ID `{department_id}` does not exist."
+                f"Department with ID `{department_id}` does not exist. "
                 f"Employee cannot be added"
             )
         return department
