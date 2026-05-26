@@ -3,7 +3,6 @@ from typing import (
     Sequence,
 )
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from org_struct.domain.errors import DepartmentNotFound
 from org_struct.domain.models import (
@@ -42,20 +41,6 @@ class BaseRepository(Generic[T_Model]):
 
 
 class DepartmentRepo(BaseRepository[T_Department]):
-    def get_with_tree(
-            self,
-            department_id: int,
-        ) -> T_Department | None:
-        return (
-            self.session.query(self.model_cls)
-            .options(
-                selectinload(self.model_cls.children),
-                selectinload(self.model_cls.employees),
-            )
-            .filter(self.model_cls.id == department_id)
-            .one()
-        )
-
     def find_by_name_and_parent_id(
             self,
             name: str,
@@ -66,6 +51,19 @@ class DepartmentRepo(BaseRepository[T_Department]):
             parent_id = parent_id
         )
         return self.session.execute(stmt).scalars().all()
+    
+    def get_children(
+            self,
+            parent_id: int
+    ) -> Sequence[T_Department]:
+        stmt = select(self.model_cls).filter_by(parent_id=parent_id)
+        return self.session.execute(stmt).scalars().all()
+        
 
-
-class EmployeeRepo(BaseRepository[T_Employee]): ...
+class EmployeeRepo(BaseRepository[T_Employee]):
+    def get_by_department_id(
+            self,
+            department_id: int,
+    ) -> Sequence[T_Employee]:
+        stmt = select(self.model_cls).filter_by(department_id = department_id)
+        return self.session.execute(stmt).scalars().all()

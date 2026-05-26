@@ -51,19 +51,46 @@ class Service:
             )
         return department
 
-    def _limit_tree(
+    def _build_tree(
           self,
           department: Department,
-          depth: int,
-          current: int = 1,
-    ) -> Department:
+          depth: int = 1,
+          current_depth: int = 1,
+    ) -> dict:
         depth = max(1, min(depth, 5))
-        if current >= depth:
-            department.children = []
-            return department
-        for child in department.children:
-            self._limit_tree(child, depth, current + 1)
-        return department
+        result = {
+            "id": department.id,
+            "name": department.name,
+            "parent_id": department.parent_id,
+            "employees": [],
+            "children": [],
+        }
+        if current_depth >= depth:
+            return result
+        employees = self.repos.employee.get_by_department_id(
+            department_id=department.id
+        )
+        result["employees"] = [
+            EmployeeDTO(
+                id=employee.id,
+                department_id=employee.department_id,
+                full_name=employee.full_name,
+                position=employee.position,
+            )
+            for employee in employees
+        ]
+        children = self.repos.department.get_children(
+            parent_id=department.id
+        )
+        result["children"] = [
+            self._build_tree(
+                department=child,
+                depth=depth,
+                current_depth=current_depth + 1
+            )
+            for child in children
+        ]
+        return result
 
     def _avoid_department_cycle(
             self,
@@ -119,14 +146,14 @@ class Service:
         depth: int,
         include_employees: bool,
     ) -> TreeDTO | TreeWithEmployeesDTO:
-        department =self.repos.department.get_with_tree(department_id)
+        department =self._check_department_exists(department_id)
         if department is None:
             raise DepartmentNotFound(
                 f"Department with ID `{department_id}` does not exist."
             )
-        department = self._limit_tree(department, depth)
+        tree: dict = self._build_tree(department, depth)
         result = TreeWithEmployeesDTO if include_employees else TreeDTO
-        return result.model_validate(department)
+        return result.model_validate(tree)
 
     def move_department(
         self,
@@ -159,8 +186,10 @@ class Service:
                 f"`reassign_to_department_id` cannot be the same "
                 f"as `department_id`"
             )
-        for employee in department.employees:
-            employee.department = target_department
-        for child in department.children:
+        employees = self.repos.employee.get_by_department_id(department_id)
+        for employee in employees:
+            employee.department_id = target_department.id
+        children = self.repos.department.get_children(department_id)
+        for child in children:
             child.parent_id = department.parent_id
         self.repos.department.delete(department)
