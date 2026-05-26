@@ -4,6 +4,7 @@ from org_struct.domain.errors import (
     DepartmentNameConflict,
     DepartmentNotFound,
     DepartmentCycleError,
+    EmployeeReassignmentError,
 )
 from org_struct.domain.repo_interface import Repositories
 from org_struct.domain.models import (
@@ -182,7 +183,7 @@ class Service:
             reassign_to_department_id
         )
         if target_department.id == department.id:
-            raise ValueError(
+            raise EmployeeReassignmentError(
                 f"`reassign_to_department_id` cannot be the same "
                 f"as `department_id`"
             )

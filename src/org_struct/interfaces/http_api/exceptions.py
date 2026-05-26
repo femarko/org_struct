@@ -8,6 +8,7 @@ from org_struct.domain.errors import (
     DepartmentNameConflict,
     ORMError,
     ORMIntegrityError,
+    EmployeeReassignmentError,
 )
 
 
@@ -33,3 +34,7 @@ def register_exception_handlers(app):
     async def orm_integrity_error_exception_handler(request: Request, exc: ORMIntegrityError):
         raise HTTPException(status_code=409, detail=str(exc))
     
+
+    @app.exception_handler(EmployeeReassignmentError)
+    async def employee_reassignment_error_exception_handler(request: Request, exc: EmployeeReassignmentError):
+        raise HTTPException(status_code=422, detail=str(exc))
