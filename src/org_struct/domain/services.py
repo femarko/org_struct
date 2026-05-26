@@ -47,8 +47,7 @@ class Service:
         department = self.repos.department.get_by_id(department_id)
         if department is None:
             raise DepartmentNotFound(
-                f"Department with ID `{department_id}` does not exist. "
-                f"Employee cannot be added"
+                f"Department with ID `{department_id}` does not exist"
             )
         return department
 
@@ -102,10 +101,9 @@ class Service:
         while current_department_id is not None:
             if current_department_id == department_id:
                 raise DepartmentCycleError("Department cycle detected")
-            current_department_id = (
-                self.repos.department.get_by_id(current_department_id)
-                .parent_id
-            )
+            new_parent = self._check_department_exists(current_department_id)
+            current_department_id = new_parent.parent_id
+
 
     def add_department(
         self,
@@ -148,10 +146,6 @@ class Service:
         include_employees: bool,
     ) -> TreeDTO | TreeWithEmployeesDTO:
         department =self._check_department_exists(department_id)
-        if department is None:
-            raise DepartmentNotFound(
-                f"Department with ID `{department_id}` does not exist."
-            )
         tree: dict = self._build_tree(department, depth)
         result = TreeWithEmployeesDTO if include_employees else TreeDTO
         return result.model_validate(tree)
