@@ -154,6 +154,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env.loc
 
 # Spyder project settings
 .spyderproject
@@ -214,3 +215,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# local dev stuff
+docker-compose_loc.yml
