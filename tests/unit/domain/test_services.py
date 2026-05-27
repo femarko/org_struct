@@ -57,7 +57,6 @@ def test_add_employee_creates_employee(service):
     assert result.department_id == dept.id
     assert result.position == "Dev"
     assert result.full_name == "John Doe"
-    assert result.created_at is not None
 
 
 def test_cannot_add_employee_to_non_existing_department(service):

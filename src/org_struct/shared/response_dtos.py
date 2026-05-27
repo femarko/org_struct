@@ -27,10 +27,6 @@ class EmployeeDTO(BaseModel):
     department_id: int = Field(examples=[42])
     position: str = Field(examples=["Sales Manager"])
     full_name: str = Field(examples=["John Doe"])
-    created_at: datetime = Field(
-        default=datetime.now(timezone.utc),
-        examples=["2022-01-01T00:00:00Z"]
-    )
 
     model_config = ConfigDict(from_attributes=True)
 
