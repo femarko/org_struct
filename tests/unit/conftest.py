@@ -1,3 +1,4 @@
+
 import pytest
 from org_struct.domain.services import Service
 
