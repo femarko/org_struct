@@ -2,7 +2,7 @@
 import pytest
 from org_struct.domain.services import Service
 
-from tests.fakes import (
+from tests.unit.fakes import (
     FakeDepartmentRepo,
     FakeEmployeeRepo
 )
