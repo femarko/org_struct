@@ -33,10 +33,10 @@ def get_session() -> Generator[sqlalchemy_session, None, None]:
         session.commit()
     except IntegrityError as e:
         session.rollback()
-        raise ORMIntegrityError("Constraint violation") from e
+        raise ORMIntegrityError(f"Constraint violation: {str(e)}") from e
     except SQLAlchemyError as e:
         session.rollback()
-        raise ORMError("Database operation failed") from e
+        raise ORMError(f"Database operation failed: {str(e)}") from e
     except Exception:
         session.rollback()
         raise
