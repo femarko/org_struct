@@ -13,32 +13,43 @@ from org_struct.domain.errors import (
 )
 
 
-
-@pytest.mark.parametrize(
-    "parent_id",
-    [None, 3]
-)
-def test_add_department_creates_root_or_child_department_depending_on_parent_id_argument(service, parent_id):
-    svc, repos = service
-    result: DepartmentDTO = svc.add_department(name="Backend", parent_id=parent_id)
+def test_add_department_creates_root_department_when_parent_id_is_missing(service):
+    svc, _ = service
+    result: DepartmentDTO = svc.add_department(name="Backend")
     assert result.id == 1
     assert result.name == "Backend"
-    assert result.parent_id == parent_id
+    assert result.parent_id is None
     assert result.created_at is not None
 
 
-@pytest.mark.parametrize(
-    "parent_id, name",
-    [
-        (None, "Backend"),
-        (3, "Backend"),
-    ]
-)
-def test_departments_with_same_names_and_parent_ids_are_not_allowed(service, parent_id, name):
+def test_add_department_creates_child_when_parent_id_is_passed(service):
     svc, _ = service
-    svc.add_department(name=name, parent_id=parent_id)
+    child_name = "Backend"
+    parent = svc.add_department(name="IT")
+    result: DepartmentDTO = svc.add_department(name=child_name, parent_id=parent.id)
+    assert isinstance(result.id, int)
+    assert result.name == child_name
+    assert result.parent_id == parent.id
+    assert result.created_at is not None
+
+
+def test_root_departmets_with_same_names_are_not_allowed(service):
+    svc, _ = service
+    svc.add_department(name="Backend")
     with pytest.raises(DepartmentNameConflict) as e:
-        svc.add_department(name="Backend", parent_id=parent_id)
+        svc.add_department(name="Backend")
+    assert str(e.value) == (
+        "Department with the same name and parent_id or a top level department "
+        "with the same name already exists"
+    )
+
+
+def test_non_root_departments_with_same_names_and_parent_ids_are_not_allowed(service):
+    svc, _ = service
+    parent = svc.add_department(name="Test")
+    svc.add_department(name="Backend", parent_id=parent.id)
+    with pytest.raises(DepartmentNameConflict) as e:
+        svc.add_department(name="Backend", parent_id=parent.id)
     assert str(e.value) == (
         "Department with the same name and parent_id or a top level department "
         "with the same name already exists"
