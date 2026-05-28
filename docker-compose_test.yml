@@ -1,0 +1,34 @@
+services:
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5431:5432"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pg_admin:
+    image: dpage/pgadmin4:8
+    env_file:
+      - .env
+    ports:
+      - "5050:80"
+    mem_limit: 2g
+    cpus: 0.5
+    depends_on:
+      - db
+
+  test:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head && pytest -v -x --cov=org_struct"
