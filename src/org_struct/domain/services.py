@@ -110,6 +110,8 @@ class Service:
         name: str,
         parent_id: int | None = None,
     ) -> DepartmentDTO:
+        if parent_id is not None:
+            self._check_department_exists(parent_id)
         self._avoid_department_name_conflict(
             parent_id,
             name,
@@ -173,18 +175,23 @@ class Service:
         if mode == DeletionMode.CASCADE:
             self.repos.department.delete(department) 
             return
-        target_department = self._check_department_exists(
-            reassign_to_department_id
-        )
-        if target_department.id == department.id:
-            raise EmployeeReassignmentError(
-                f"`reassign_to_department_id` cannot be the same "
-                f"as `department_id`"
+        if mode == DeletionMode.REASSIGN:
+            if reassign_to_department_id is None:
+                raise EmployeeReassignmentError(
+                    f"`reassign_to_department_id` is missing"
+                )
+            target_department = self._check_department_exists(
+                reassign_to_department_id
             )
-        employees = self.repos.employee.get_by_department_id(department_id)
-        for employee in employees:
-            employee.department_id = target_department.id
-        children = self.repos.department.get_children(department_id)
-        for child in children:
-            child.parent_id = department.parent_id
-        self.repos.department.delete(department)
+            if target_department.id == department.id:
+                raise EmployeeReassignmentError(
+                    f"`reassign_to_department_id` cannot be the same "
+                    f"as `department_id`"
+                )
+            employees = self.repos.employee.get_by_department_id(department_id)
+            for employee in employees:
+                employee.department_id = target_department.id
+            children = self.repos.department.get_children(department_id)
+            for child in children:
+                child.parent_id = department.parent_id
+            self.repos.department.delete(department)
